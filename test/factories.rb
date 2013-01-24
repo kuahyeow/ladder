@@ -2,7 +2,7 @@ FactoryGirl.define do
 
   factory :user, :aliases => [:owner] do
     name 'Bob Bobson'
-    email 'bob@bobson.com'
+    sequence(:email) {|n| "bob_#{n}@bobson.com"}
   end
 
   factory :service do
@@ -31,6 +31,14 @@ FactoryGirl.define do
     pro false
     rating 1000
     games_played 0
+  end
+
+  factory :glicko2_rating, :aliases => [:rating] do
+    user
+    tournament
+    rating Glicko2::DEFAULT_GLICKO_RATING
+    rating_deviation Glicko2::DEFAULT_GLICKO_RATING_DEVIATION
+    volatility Glicko2::DEFAULT_VOLATILITY
   end
 
   factory :invite do

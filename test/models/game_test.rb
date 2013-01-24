@@ -5,12 +5,15 @@ describe Game do
     @game = create(:game)
     @user1 = create(:user)
     @user2 = create(:user)
-    @game_rank1 = create(:game_rank, :game => @game, :user => @user1, :confirmed_at => Time.zone.now, :position => 1)
-    @game_rank2 = create(:game_rank, :game => @game, :user => @user2, :confirmed_at => Time.zone.now, :position => 2)
-    @rank1 = create(:rank, :tournament => @game.tournament, :user => @user1)
-    @rank2 = create(:rank, :tournament => @game.tournament, :user => @user2)
-    @rating1 = create(:elo_rating, :tournament => @game.tournament, :user => @user1)
-    @rating2 = create(:elo_rating, :tournament => @game.tournament, :user => @user2)
+    @game_rank1 = create(:game_rank, :game => @game, :user => @user1, :position => 1)
+    @game_rank2 = create(:game_rank, :game => @game, :user => @user2, :position => 2)
+  end
+
+  describe ".destroy" do
+    it "must destroy descendent game ranks" do
+      @game.destroy
+      GameRank.where(:game_id => @game.id).count.must_equal 0
+    end
   end
 
   describe ".with_participant" do
@@ -25,28 +28,32 @@ describe Game do
     end
   end
 
-  describe "#confirmed?" do
-    it "must be true when all game ranks are confirmed" do
-      @game.confirmed?.must_equal true
+  describe "#confirm_user" do
+    it "must confirm the users rank" do
+      @game.confirm_user(@user1)
+      @game_rank1.reload.confirmed?.must_equal true
     end
 
-    it "wont be true when any game ranks are not confirmed" do
-      @game_rank1.update_attributes(:confirmed_at => nil)
-      @game.confirmed?.wont_equal true
+    it "wont confirm other users rank" do
+      @game.confirm_user(@user1)
+      @game_rank2.reload.confirmed?.wont_equal true
+    end
+
+    it "must return true when game is confirmed" do
+      @game.confirm_user(@user1).wont_equal true
+      @game.confirm_user(@user2).must_equal true
     end
   end
 
-  describe "#process" do
-    it "must update ranks" do
-      @game.process
-      @rank1.reload.rank.wont_be_close_to 0.0
-      @rank2.reload.rank.wont_be_close_to 0.0
+  describe "#confirmed?" do
+    it "must be true when confirmed_at is not nil" do
+      @game.confirmed_at = Time.zone.now
+      @game.confirmed?.must_equal true
     end
 
-    it "must update ratings" do
-      @game.process
-      @rating1.reload.rating.wont_be_close_to 1000
-      @rating2.reload.rating.wont_be_close_to 1000
+    it "wont be true when confirmed_at is nil" do
+      @game.confirmed_at = nil
+      @game.confirmed?.wont_equal true
     end
   end
 end

@@ -8,14 +8,16 @@ require "minitest/rails/capybara"
 # Uncomment if you want awesome colorful output
 # require "minitest/pride"
 
-FactoryGirl.find_definitions
-
 class MiniTest::Rails::ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
   fixtures :all
 
   # Add more helper methods to be used by all tests here...
   include FactoryGirl::Syntax::Methods
+
+  before do
+    ActionMailer::Base.deliveries.clear
+  end
 
   def login_service
     service = create(:service)
@@ -25,6 +27,12 @@ class MiniTest::Rails::ActiveSupport::TestCase
     must_have_content "Signed in successfully via Developer"
     service
   end
+end
+
+class ActionDispatch::IntegrationTest
+  include Rails.application.routes.url_helpers
+  include Capybara::RSpecMatchers
+  include Capybara::DSL
 end
 
 # Do you want all existing Rails tests to use MiniTest::Rails?

@@ -14,6 +14,9 @@ class GamesController < ApplicationController
     @game = @tournament.games.build params.require(:game).permit(:game_ranks_attributes => [:user_id, :position])
     if @game.save
       @game.game_ranks.with_participant(current_user).readonly(false).first!.confirm
+      @game.game_ranks.each do |game_rank|
+        Notifications.game_confirmation(game_rank.user, @game).deliver unless game_rank.confirmed?
+      end
       redirect_to tournament_game_path(@tournament, @game)
     else
       render :new
@@ -26,10 +29,8 @@ class GamesController < ApplicationController
   end
 
   def confirm
-    @game = @tournament.games.with_participant(current_user).find(params[:id])
-    @game_rank = @game.game_ranks.with_participant(current_user).readonly(false).first!
-    if @game_rank.confirm && @game.confirmed?
-      @game.process
+    @game = @tournament.games.with_participant(current_user).readonly(false).find(params[:id])
+    if @game.confirm_user(current_user)
       redirect_to tournament_path(@tournament)
     else
       redirect_to tournament_game_path(@tournament, @game)

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.8'
+gem 'rails', '3.2.11'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -39,14 +39,18 @@ gem 'omniauth'
 gem 'omniauth-google-oauth2'
 gem 'twitter-bootstrap-rails'
 gem 'strong_parameters'
-gem 'trueskill', :require => 'saulabs/trueskill'
 gem 'dalli'
-gem "elo", "~> 0.1.0", :require => 'elo'
 gem 'kaminari'
+gem 'glicko2'
+gem 'whenever', :require => false
+gem 'exception_notification'
 
 group :test, :development do
   gem 'minitest-rails'
   gem 'minitest-rails-capybara'
-  gem 'factory_girl'
+  gem 'factory_girl_rails', '~> 4.0'
   gem 'guard-minitest'
+  gem 'rb-inotify', :require => false
+  gem 'rb-fsevent', :require => false
+  gem 'rb-fchange', :require => false
 end
