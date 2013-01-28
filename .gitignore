@@ -15,4 +15,5 @@
 /tmp
 
 .rbenv-version
+.rvmrc
 .DS_Store
