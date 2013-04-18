@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.11'
+gem 'rails', '3.2.13'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -32,9 +32,6 @@ gem 'jquery-rails'
 # Deploy with Capistrano
 gem 'capistrano'
 
-# To use debugger
-# gem 'debugger'
-
 gem 'omniauth'
 gem 'omniauth-google-oauth2'
 gem 'twitter-bootstrap-rails'
@@ -44,13 +41,12 @@ gem 'kaminari'
 gem 'glicko2'
 gem 'whenever', :require => false
 gem 'exception_notification'
+gem 'redcarpet'
+gem 'rickshaw_rails'
 
 group :test, :development do
   gem 'minitest-rails'
   gem 'minitest-rails-capybara'
   gem 'factory_girl_rails', '~> 4.0'
-  gem 'guard-minitest'
-  gem 'rb-inotify', :require => false
-  gem 'rb-fsevent', :require => false
-  gem 'rb-fchange', :require => false
+  gem 'debugger'
 end

@@ -1,6 +1,6 @@
 FactoryGirl.define do
 
-  factory :user, :aliases => [:owner] do
+  factory :user, :aliases => [:owner, :challenger, :defender] do
     name 'Bob Bobson'
     sequence(:email) {|n| "bob_#{n}@bobson.com"}
   end
@@ -16,29 +16,12 @@ FactoryGirl.define do
   factory :tournament do
     owner
     sequence(:name) {|n| "Tournament #{n}"}
-  end
 
-  factory :rank do
-    user
-    tournament
-    mu 25.0
-    sigma 25.0 / 3.0
-  end
-
-  factory :elo_rating do
-    user
-    tournament
-    pro false
-    rating 1000
-    games_played 0
-  end
-
-  factory :glicko2_rating, :aliases => [:rating] do
-    user
-    tournament
-    rating Glicko2::DEFAULT_GLICKO_RATING
-    rating_deviation Glicko2::DEFAULT_GLICKO_RATING_DEVIATION
-    volatility Glicko2::DEFAULT_VOLATILITY
+    factory :started_tournament do
+      after :create do |tournament, evaluator|
+        FactoryGirl.create :rating_period, :tournament => tournament
+      end
+    end
   end
 
   factory :invite do
@@ -50,6 +33,7 @@ FactoryGirl.define do
   end
 
   factory :game do
+    owner
     tournament
   end
 
@@ -57,6 +41,31 @@ FactoryGirl.define do
     game
     user
     sequence(:position) {|n| n}
+  end
+
+  factory :challenge do
+    tournament
+    challenger
+    defender
+    message 'The message'
+    expires_at { 1.day.from_now }
+  end
+
+  factory :page do
+    content 'The content'
+  end
+
+  factory :rating_period do
+    tournament
+    period_at { 1.year.ago }
+  end
+
+  factory :rating do
+    rating_period
+    user
+    rating Glicko2::DEFAULT_GLICKO_RATING
+    rating_deviation Glicko2::DEFAULT_GLICKO_RATING_DEVIATION
+    volatility Glicko2::DEFAULT_VOLATILITY
   end
 
 end

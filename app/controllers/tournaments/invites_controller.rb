@@ -1,9 +1,9 @@
-class InvitesController < ApplicationController
+class Tournaments::InvitesController < ApplicationController
   before_filter :authenticate_user!
   before_filter :find_invite_for_tournament, :only => [:show, :update]
   before_filter :find_tournament_with_current_user, :only => [:new, :create]
 
-  layout 'tournaments'
+  layout 'tournament_title', :only => [:new, :create]
 
   def show
   end

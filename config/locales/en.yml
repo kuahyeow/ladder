@@ -2,4 +2,156 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
-  hello: "Hello world"
+  application:
+    name: Ladder
+    fork_me:
+      text: Fork me on Github
+      href: https://github.com/proglottis/ladder
+    issues:
+      text: Request features & Report bugs
+      href: https://github.com/proglottis/ladder/issues
+    version:
+      text: Version %{version}
+      href: https://github.com/proglottis/ladder/tree/%{version}
+
+  sessions:
+    login: Login
+    logout: Logout
+    authentication_required: You need to sign in before accessing this page
+    show:
+      login_with: Login with %{name}
+      title: Login
+    new:
+      new_authentication: This authentication is new to Ladder
+      confirm: Confirm
+      unknown: Unknown
+    create:
+      success: Signed in successfully via %{provider}
+      canceled: Sign in via %{provider} canceled
+      unknown: Unknown account creation error
+    destroy:
+      success: Logged out successfully
+    failure:
+      invalid: Invalid credentials
+      timed_out: Authentication timed out
+      unknown: Unknown authentication error
+
+
+  settings:
+    show:
+      title: Settings
+    update:
+      updated: Settings have been updated
+
+  homes:
+    show:
+      title: Home
+      welcome: Welcome %{name}
+      slogan: Create and manage tournaments for pool, foosball or anything. Compete against your friends and colleagues.
+      start: Login to start
+
+  tournaments:
+    index:
+      feed: News Feed
+      start: Start tournament
+      can_start: You can only start %{count} more
+      unconfirmed: Unconfirmed game for %{tournament} on %{time}.
+      confirmed: Confirmed game for %{tournament} on %{time}.
+    new:
+      title: Start tournament
+    show:
+      title: Ladder
+      games_to_process_on:
+        one: There is %{count} game to be processed on %{time}.
+        other: There are %{count} games to be processed on %{time}.
+      log_a_game: Log a game
+      no_rated_players: There are no rated players.
+      rank: Rank
+    information:
+      title: Information
+    edit:
+      title: Edit
+
+    invites:
+      new:
+        title: Invite player
+        invites_left:
+          one: "%{count} invite left"
+          other: "%{count} invites left"
+      show:
+        invited_to: You have been invited to join %{name}.
+
+  games:
+    index:
+      pending: Pending Confirmation
+      unconfirmed: Unconfirmed Games
+    new:
+      title: New game
+    show:
+      status: Status
+      confirmed: Confirmed, %{time} ago
+      unconfirmed: Unconfirmed
+      confirm: Confirm
+
+  challenges:
+    index:
+      defending: Defending
+      challenging: Challenging
+    new:
+      title: New challenge
+      rules: Challenge a player to a game. %{defender} will have 7 days to log the result against this challenge or s/he will lose by default.
+    show:
+      rules: This challenge expires on %{time}. If %{defender} does not log a game against it before then s/he will lose by default.
+      responded: "%{defender} has responded to this challenge."
+      won: I won
+      lost: I lost
+
+  notifications:
+    tournament_invitation:
+      subject: You have been invited
+      invited: You have been invited to %{tournament}.
+      accept: "To join the tournament, follow the link: %{link}"
+    game_confirmation:
+      subject: Confirm game
+      game_logged: "A game you participated in has been logged. Follow the link to confirm:"
+    game_confirmed:
+      subject: Game confirmed
+      confirmed: "A game you participated in has been confirmed."
+    challenged:
+      subject: You have been challenged
+      challenged: "%{challenger} has challenged you on %{tournament}."
+      challenged_with_message: "%{challenger} has challenged you on %{tournament}:"
+      rules: "Failure to respond within 7 days will result in losing by default. Once you have played your game, follow the link to log your response:"
+
+  layouts:
+    tournament_title:
+      join:
+        title: You are not rated in this tournament
+        message: To challenge or log games with other players you first need to join.
+        link: Join
+
+  activerecord:
+    models:
+      user: Player
+      game_rank: Place
+    attributes:
+      service:
+        uid: UID
+
+  helpers:
+    cancel_link: Cancel
+    submit:
+      create: Create
+      update: Update
+      invite:
+        create: Invite
+        update: Accept
+      tournament:
+        create: Start tournament
+      challenge:
+        update: Respond
+
+  support:
+    array:
+      versus:
+        two_words_connector: " vs "

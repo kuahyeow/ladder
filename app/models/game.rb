@@ -1,11 +1,24 @@
 class Game < ActiveRecord::Base
   belongs_to :tournament
+  belongs_to :owner, :class_name => 'User'
   has_many :game_ranks, :dependent => :destroy, :order => 'position'
 
   accepts_nested_attributes_for :game_ranks
 
-  def self.with_participant(user)
-    joins(:game_ranks).where(:game_ranks => {:user_id => user.id})
+  def self.with_participant(*users)
+    games = arel_table
+    n = 0
+    user_joins = users.reduce(games) do |user_joins, user|
+      n += 1
+      game_ranks = GameRank.arel_table.alias("users_with_participant_#{n}")
+      user_joins.join(game_ranks).on(games[:id].eq(game_ranks[:game_id]).
+                                      and(game_ranks[:user_id].eq(user.id)))
+    end
+    joins(user_joins.join_sql)
+  end
+
+  def self.unconfirmed
+    where(:confirmed_at => nil)
   end
 
   def confirm_user(user)
@@ -35,6 +48,6 @@ class Game < ActiveRecord::Base
   end
 
   def versus
-    game_ranks.map {|game_rank| game_rank.user.name}.join(' vs ')
+    game_ranks.map {|game_rank| game_rank.user.name}.to_sentence(:two_words_connector => I18n.t('support.array.versus.two_words_connector'))
   end
 end

@@ -1,4 +1,4 @@
-require "minitest_helper"
+require "test_helper"
 
 describe "SessionsController Integration Test" do
 
@@ -15,11 +15,11 @@ describe "SessionsController Integration Test" do
     it "must authenticate" do
       visit session_path
       click_link "Developer"
-      must_have_content "Signed in successfully via Developer"
+      must_have_content I18n.translate('sessions.create.success', :provider => 'Developer')
     end
 
     it "must redirect back after authentication" do
-      @tournament = create(:tournament, :owner => @user)
+      @tournament = create(:started_tournament, :owner => @user)
       visit tournament_path @tournament
       click_link "Developer"
       must_have_content @tournament.name
@@ -29,7 +29,7 @@ describe "SessionsController Integration Test" do
       @omniauth['info']['image'] = 'http://localhost:3000'
       visit session_path
       click_link "Developer"
-      must_have_content "Signed in successfully via Developer"
+      must_have_content I18n.translate('sessions.create.success', :provider => 'Developer')
       @service.reload.image_url.must_equal 'http://localhost:3000'
     end
   end
@@ -42,45 +42,45 @@ describe "SessionsController Integration Test" do
       must_have_content @omniauth["uid"]
       must_have_content @omniauth["info"]["name"]
       must_have_content @omniauth["info"]["email"]
-      must_have_button "Confirm"
-      must_have_button "Cancel"
+      must_have_button I18n.translate('sessions.new.confirm')
+      must_have_button I18n.translate('helpers.cancel_link')
     end
 
     it "must authenticate" do
       visit session_path
       click_link "Developer"
-      click_button "Confirm"
-      must_have_content "Signed in successfully via Developer"
+      click_button I18n.translate('sessions.new.confirm')
+      must_have_content I18n.translate('sessions.create.success', :provider => 'Developer')
     end
 
     it "must redirect on cancel" do
       visit session_path
       click_link "Developer"
-      click_button "Cancel"
-      must_have_content "Sign in via Developer canceled"
+      click_button I18n.translate('helpers.cancel_link')
+      must_have_content I18n.translate('sessions.create.canceled', :provider => 'Developer')
     end
   end
 
   describe "failure" do
     it "must display invalid credentials" do
-      OmniAuth.config.mock_auth[:developer] = :invalid_credencials
+      OmniAuth.config.mock_auth[:developer] = :invalid_credentials
       visit session_path
       click_link "Developer"
-      must_have_content "Invalid credentials"
+      must_have_content I18n.translate('sessions.failure.invalid')
     end
 
     it "must display time out" do
       OmniAuth.config.mock_auth[:developer] = :timeout
       visit session_path
       click_link "Developer"
-      must_have_content "Authentication timed out"
+      must_have_content I18n.translate('sessions.failure.timed_out')
     end
 
     it "must display unknown error" do
       OmniAuth.config.mock_auth[:developer] = :something_else
       visit session_path
       click_link "Developer"
-      must_have_content "Unknown authentication error"
+      must_have_content I18n.translate('sessions.failure.unknown')
     end
   end
 
@@ -88,9 +88,9 @@ describe "SessionsController Integration Test" do
     it "must log user out" do
       visit session_path
       click_link "Developer"
-      click_button "Confirm"
+      click_button I18n.translate('sessions.new.confirm')
       visit logout_path
-      must_have_content "Logged out successfully"
+      must_have_content I18n.translate('sessions.destroy.success')
     end
   end
 end

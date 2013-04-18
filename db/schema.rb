@@ -11,19 +11,23 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130115045713) do
+ActiveRecord::Schema.define(:version => 20130401014528) do
 
-  create_table "elo_ratings", :force => true do |t|
-    t.integer  "user_id",       :null => false
+  create_table "challenges", :force => true do |t|
     t.integer  "tournament_id", :null => false
-    t.integer  "rating",        :null => false
-    t.integer  "games_played",  :null => false
-    t.boolean  "pro",           :null => false
+    t.integer  "challenger_id", :null => false
+    t.integer  "defender_id",   :null => false
+    t.integer  "game_id"
+    t.text     "message"
+    t.datetime "expires_at",    :null => false
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
   end
 
-  add_index "elo_ratings", ["user_id"], :name => "index_elo_ratings_on_user_id"
+  add_index "challenges", ["challenger_id"], :name => "index_challenges_on_challenger_id"
+  add_index "challenges", ["defender_id"], :name => "index_challenges_on_defender_id"
+  add_index "challenges", ["game_id"], :name => "index_challenges_on_game_id"
+  add_index "challenges", ["tournament_id"], :name => "index_challenges_on_tournament_id"
 
   create_table "game_ranks", :force => true do |t|
     t.integer  "game_id",      :null => false
@@ -42,19 +46,11 @@ ActiveRecord::Schema.define(:version => 20130115045713) do
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
     t.datetime "confirmed_at"
+    t.integer  "owner_id",      :null => false
   end
 
+  add_index "games", ["owner_id"], :name => "index_games_on_owner_id"
   add_index "games", ["tournament_id"], :name => "index_games_on_tournament_id"
-
-  create_table "glicko2_ratings", :force => true do |t|
-    t.integer  "user_id",                                          :null => false
-    t.integer  "tournament_id",                                    :null => false
-    t.decimal  "rating",           :precision => 38, :scale => 10, :null => false
-    t.decimal  "rating_deviation", :precision => 38, :scale => 10, :null => false
-    t.decimal  "volatility",       :precision => 38, :scale => 10, :null => false
-    t.datetime "created_at",                                       :null => false
-    t.datetime "updated_at",                                       :null => false
-  end
 
   create_table "invites", :force => true do |t|
     t.integer  "user_id"
@@ -72,17 +68,39 @@ ActiveRecord::Schema.define(:version => 20130115045713) do
   add_index "invites", ["tournament_id"], :name => "index_invites_on_tournament_id"
   add_index "invites", ["user_id"], :name => "index_invites_on_user_id"
 
-  create_table "ranks", :force => true do |t|
-    t.integer  "user_id",                                       :null => false
-    t.integer  "tournament_id",                                 :null => false
-    t.decimal  "mu",            :precision => 38, :scale => 10, :null => false
-    t.decimal  "sigma",         :precision => 38, :scale => 10, :null => false
-    t.datetime "created_at",                                    :null => false
-    t.datetime "updated_at",                                    :null => false
+  create_table "pages", :force => true do |t|
+    t.text     "content"
+    t.integer  "parent_id"
+    t.string   "parent_type"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
-  add_index "ranks", ["tournament_id"], :name => "index_ranks_on_tournament_id"
-  add_index "ranks", ["user_id"], :name => "index_ranks_on_user_id"
+  add_index "pages", ["parent_id"], :name => "index_pages_on_parent_id"
+  add_index "pages", ["parent_type"], :name => "index_pages_on_parent_type"
+
+  create_table "rating_periods", :force => true do |t|
+    t.integer  "tournament_id", :null => false
+    t.datetime "period_at",     :null => false
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  add_index "rating_periods", ["period_at"], :name => "index_rating_periods_on_period_at"
+  add_index "rating_periods", ["tournament_id"], :name => "index_rating_periods_on_tournament_id"
+
+  create_table "ratings", :force => true do |t|
+    t.integer  "rating_period_id",                                 :null => false
+    t.integer  "user_id",                                          :null => false
+    t.decimal  "rating",           :precision => 38, :scale => 10, :null => false
+    t.decimal  "rating_deviation", :precision => 38, :scale => 10, :null => false
+    t.decimal  "volatility",       :precision => 38, :scale => 10, :null => false
+    t.datetime "created_at",                                       :null => false
+    t.datetime "updated_at",                                       :null => false
+  end
+
+  add_index "ratings", ["rating_period_id"], :name => "index_ratings_on_rating_period_id"
+  add_index "ratings", ["user_id"], :name => "index_ratings_on_user_id"
 
   create_table "services", :force => true do |t|
     t.integer  "user_id"
@@ -111,9 +129,10 @@ ActiveRecord::Schema.define(:version => 20130115045713) do
   create_table "users", :force => true do |t|
     t.string   "name"
     t.string   "email"
-    t.datetime "created_at",           :null => false
-    t.datetime "updated_at",           :null => false
+    t.datetime "created_at",                             :null => false
+    t.datetime "updated_at",                             :null => false
     t.integer  "preferred_service_id"
+    t.boolean  "game_confirmed_email", :default => true, :null => false
   end
 
   add_index "users", ["preferred_service_id"], :name => "index_users_on_preferred_service_id"

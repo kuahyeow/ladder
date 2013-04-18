@@ -1,29 +1,30 @@
-require "minitest_helper"
+require "test_helper"
 
 describe "GamesController Integration Test" do
 
   before do
     @service = login_service
-    @tournament = create(:tournament)
+    @tournament = create(:started_tournament)
+    @rating_period = @tournament.current_rating_period
     @user2 = create(:user)
-    @rating1 = create(:rating, :tournament => @tournament, :user => @service.user)
-    @rating2 = create(:rating, :tournament => @tournament, :user => @user2)
+    @rating1 = create(:rating, :rating_period => @rating_period, :user => @service.user)
+    @rating2 = create(:rating, :rating_period => @rating_period, :user => @user2)
   end
 
   describe "creation" do
     it "must be created" do
       visit tournament_path @tournament
-      click_link "Game"
-      click_button "Create"
+      click_link I18n.t('tournaments.show.log_a_game')
+      click_button I18n.t('helpers.submit.create')
       must_have_content @rating1.user.name
       must_have_content @rating2.user.name
-      must_have_content "Unconfirmed"
+      must_have_content I18n.t('games.show.unconfirmed')
     end
 
     it "must send confirmation email" do
       visit tournament_path @tournament
-      click_link "Game"
-      click_button "Create"
+      click_link I18n.t('tournaments.show.log_a_game')
+      click_button I18n.t('helpers.submit.create')
       ActionMailer::Base.deliveries.length.must_equal 1
       email = ActionMailer::Base.deliveries.first
       email.to.must_equal [@user2.email]
@@ -38,17 +39,27 @@ describe "GamesController Integration Test" do
     end
 
     it "must be confirmed" do
-      visit tournament_game_path @tournament, @game
-      click_link "Confirm"
-      must_have_content "Confirmed"
+      visit game_path @game
+      click_link I18n.t('games.show.confirm')
+      must_have_content I18n.t('games.show.confirmed', :time => 'less than a minute')
     end
 
-    it "must update game on final confirmation" do
-      @game_rank2.confirm
-      visit tournament_game_path @tournament, @game
-      click_link "Confirm"
-      must_have_content @tournament.name
-      @game.reload.confirmed?.must_equal true
+    describe "on final confirmation" do
+      it "must update game on final confirmation" do
+        @game_rank2.confirm
+        visit game_path @game
+        click_link I18n.t('games.show.confirm')
+        @game.reload.confirmed?.must_equal true
+      end
+
+      it "must send game confirmed email to other users" do
+        @game_rank2.confirm
+        visit game_path @game
+        click_link I18n.t('games.show.confirm')
+        ActionMailer::Base.deliveries.length.must_equal 1
+        email = ActionMailer::Base.deliveries.first
+        email.to.must_equal [@user2.email]
+      end
     end
   end
 

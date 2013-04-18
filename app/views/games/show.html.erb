@@ -1,32 +1,35 @@
 <div class="page-header">
-  <h1><%= @game.versus %> <small><%= link_to @tournament.name, tournament_path(@tournament) %></small></h1>
+  <h1><%= @game.versus %></h1>
 </div>
 
-<table class="table">
+<dl class="dl-horizontal">
+  <dt><%= Tournament.model_name.human %></dt>
+  <dd><%= link_to @tournament.name, tournament_path(@tournament) %></dd>
+</dl>
+
+<table class="table table-bordered table-condensed">
   <thead>
-    <th>Name</th>
-    <th>Place</th>
-    <th>Status</th>
-    <th></th>
+    <th><%= User.model_name.human %></th>
+    <th><%= GameRank.model_name.human %></th>
+    <th><%= t '.status' %></th>
   </thead>
   <tbody>
     <% @game_ranks.each do |game_rank| %>
       <tr>
-        <td><%= gravatar_image_tag game_rank.user.email %> <%= game_rank.user.name %></td>
+        <td><%= profile_link_tag game_rank.user %></td>
         <td><%= game_rank.position %></td>
         <td>
           <% if game_rank.confirmed? %>
-            Confirmed, <%= time_ago_in_words game_rank.confirmed_at %> ago
+            <%= t '.confirmed', :time => time_ago_in_words(game_rank.confirmed_at) %>
           <% else %>
-            Unconfirmed
-          <% end %>
-        </td>
-        <td>
-          <% if !game_rank.confirmed? && game_rank.user == current_user %>
-            <%= link_to "Confirm", confirm_tournament_game_path(@tournament, @game), :method => :post, :class => 'btn' %>
+            <%= t '.unconfirmed' %>
           <% end %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<% if @current_game_rank && !@current_game_rank.confirmed? %>
+  <%= link_to t('.confirm'), confirm_game_path(@game), :method => :post, :class => 'btn btn-primary' %>
+<% end %>
